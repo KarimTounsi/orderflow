@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: product-service
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/orderflow_products
+    redis:
+      host: localhost
+      port: 6379
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 300000  # 5 minutes in ms
+
+server:
+  port: 8081
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
