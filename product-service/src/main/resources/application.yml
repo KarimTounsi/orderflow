@@ -6,10 +6,10 @@ spring:
     virtual:
       enabled: true
 
+  mongodb:
+    uri: mongodb://localhost:27017/orderflow_products
+
   data:
-    mongodb:
-      uri: mongodb://localhost:27017
-      database: orderflow_products
     redis:
       host: localhost
       port: 6379
