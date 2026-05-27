@@ -2,26 +2,38 @@ spring:
   application:
     name: product-service
 
+  threads:
+    virtual:
+      enabled: true
+
   data:
     mongodb:
-      uri: mongodb://localhost:27017/orderflow_products
+      uri: mongodb://localhost:27017
+      database: orderflow_products
     redis:
       host: localhost
       port: 6379
 
   cache:
     type: redis
+    cache-names: products, categories
     redis:
-      time-to-live: 300000  # 5 minutes in ms
+      time-to-live: 5m
 
 server:
   port: 8081
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health, info, metrics
   endpoint:
     health:
       show-details: always

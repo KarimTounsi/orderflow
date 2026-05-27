@@ -85,6 +85,30 @@ services:
       kafka:
         condition: service_healthy
 
+  # ─── Mongo Express (MongoDB UI) ──────────────────────────────────────────────
+  mongo-express:
+    image: mongo-express:latest
+    container_name: orderflow-mongo-express
+    ports:
+      - "8091:8081"
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_BASICAUTH: "false"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+  # ─── Redis Commander (Redis UI) ───────────────────────────────────────────────
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: orderflow-redis-commander
+    ports:
+      - "8092:8081"
+    environment:
+      REDIS_HOSTS: local:redis:6379
+    depends_on:
+      - redis
+
   # ─── Mailhog (local email testing) ───────────────────────────────────────────
   mailhog:
     image: mailhog/mailhog:latest
