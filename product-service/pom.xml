@@ -77,7 +77,7 @@
                         <DOCKER_HOST>tcp://localhost:2375</DOCKER_HOST>
                         <DOCKER_API_VERSION>1.47</DOCKER_API_VERSION>
                     </environmentVariables>
-                    <argLine>-Dapi.version=1.47</argLine>
+                    <argLine>@{argLine} -Dapi.version=1.47</argLine>
                 </configuration>
             </plugin>
             <plugin>
