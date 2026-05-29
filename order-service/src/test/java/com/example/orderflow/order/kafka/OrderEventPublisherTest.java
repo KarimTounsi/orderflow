@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.test.util.ReflectionTestUtils;
+import tools.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -28,7 +29,10 @@ import static org.mockito.Mockito.when;
 class OrderEventPublisherTest {
 
     @Mock
-    private KafkaTemplate<String, Object> kafkaTemplate;
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+    @Mock
+    private ObjectMapper objectMapper;
 
     private OrderEventPublisher publisher;
 
@@ -36,8 +40,8 @@ class OrderEventPublisherTest {
 
     @BeforeEach
     void setUp() {
-        publisher = new OrderEventPublisher(kafkaTemplate);
-        ReflectionTestUtils.setField(publisher, "orderPlacedTopic", "order.placed");
+        publisher = new OrderEventPublisher(kafkaTemplate, objectMapper);
+        ReflectionTestUtils.setField(publisher, "orderPlacedTopic", "order-service.order.placed");
 
         event = new OrderPlacedEvent(
                 "order-uuid-123",
@@ -51,29 +55,29 @@ class OrderEventPublisherTest {
 
     @Test
     @DisplayName("should publish OrderPlacedEvent to Kafka topic with orderId as key")
-    void shouldPublishOrderPlacedEvent() {
+    void shouldPublishOrderPlacedEvent() throws Exception {
         RecordMetadata metadata = new RecordMetadata(
-                new TopicPartition("order.placed", 0), 0, 0, 0, 0, 0);
-        SendResult<String, Object> sendResult = new SendResult<>(null, metadata);
-        CompletableFuture<SendResult<String, Object>> future = CompletableFuture.completedFuture(sendResult);
-
+                new TopicPartition("order-service.order.placed", 0), 0, 0, 0, 0, 0);
+        SendResult<String, String> sendResult = new SendResult<>(null, metadata);
+        CompletableFuture<SendResult<String, String>> future = CompletableFuture.completedFuture(sendResult);
+        when(objectMapper.writeValueAsString(any())).thenReturn("{\"orderId\":\"order-uuid-123\"}");
         when(kafkaTemplate.send(any(), any(), any())).thenReturn(future);
 
         publisher.publishOrderPlaced(event);
 
-        verify(kafkaTemplate).send(eq("order.placed"), eq("order-uuid-123"), eq(event));
+        verify(kafkaTemplate).send(eq("order-service.order.placed"), eq("order-uuid-123"), any(String.class));
     }
 
     @Test
     @DisplayName("should log error when Kafka publish fails")
-    void shouldHandlePublishFailure() {
-        CompletableFuture<SendResult<String, Object>> future = new CompletableFuture<>();
+    void shouldHandlePublishFailure() throws Exception {
+        CompletableFuture<SendResult<String, String>> future = new CompletableFuture<>();
         future.completeExceptionally(new RuntimeException("Kafka broker unavailable"));
-
+        when(objectMapper.writeValueAsString(any())).thenReturn("{\"orderId\":\"order-uuid-123\"}");
         when(kafkaTemplate.send(any(), any(), any())).thenReturn(future);
 
         publisher.publishOrderPlaced(event);
 
-        verify(kafkaTemplate).send(eq("order.placed"), eq("order-uuid-123"), eq(event));
+        verify(kafkaTemplate).send(eq("order-service.order.placed"), eq("order-uuid-123"), any(String.class));
     }
 }

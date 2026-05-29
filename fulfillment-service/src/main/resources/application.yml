@@ -5,13 +5,13 @@ spring:
   kafka:
     bootstrap-servers: localhost:9094
     consumer:
-      group-id: fulfillment-group
+      group-id: fulfillment-service.order-processing.consumer
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
-        spring.json.trusted.packages: "com.example.orderflow.*"
-        spring.json.use.type.headers: false
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
   mail:
     host: localhost
@@ -27,6 +27,15 @@ spring:
 
 server:
   port: 8083
+
+kafka:
+  topics:
+    order-placed: order-service.order.placed
+    fulfillment-completed: fulfillment-service.order.completed
+    fulfillment-failed: fulfillment-service.order.failed
+
+fulfillment:
+  demo-email: customer@orderflow.demo
 
 management:
   endpoints:

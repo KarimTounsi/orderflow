@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Testcontainers
-@EmbeddedKafka(partitions = 1, topics = {"order.placed"},
+@EmbeddedKafka(partitions = 1, topics = {"order-service.order.placed"},
         bootstrapServersProperty = "spring.kafka.bootstrap-servers")
 @DisplayName("Order Integration Tests with Testcontainers")
 class OrderIntegrationTest {
