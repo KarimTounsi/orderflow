@@ -57,13 +57,13 @@ class ProductControllerTest {
     @DisplayName("GET /api/v1/products - should return paginated products")
     void shouldReturnPaginatedProducts() throws Exception {
         var page = new PageImpl<>(List.of(testResponse), PageRequest.of(0, 20), 1);
-        when(productService.getAll(any())).thenReturn(page);
+        when(productService.getAll(any(), any(), any())).thenReturn(page);
 
         mockMvc.perform(get("/api/v1/products"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id").value("test-id"))
                 .andExpect(jsonPath("$.content[0].name").value("Test Laptop"))
-                .andExpect(jsonPath("$.totalElements").value(1));
+                .andExpect(jsonPath("$.page.totalElements").value(1));
     }
 
     @Test
@@ -90,7 +90,7 @@ class ProductControllerTest {
         mockMvc.perform(get("/api/v1/products/non-existent"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.message").value("Product with id 'non-existent' not found"));
+                .andExpect(jsonPath("$.detail").value("Product with id 'non-existent' not found"));
     }
 
     @Test
@@ -148,7 +148,7 @@ class ProductControllerTest {
         mockMvc.perform(get("/api/v1/products/category/electronics"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].category").value("electronics"))
-                .andExpect(jsonPath("$.totalElements").value(1));
+                .andExpect(jsonPath("$.page.totalElements").value(1));
     }
 
     @Test
@@ -162,7 +162,7 @@ class ProductControllerTest {
         mockMvc.perform(get("/api/v1/products/search").param("name", "laptop"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].name").value("Test Laptop"))
-                .andExpect(jsonPath("$.totalElements").value(1));
+                .andExpect(jsonPath("$.page.totalElements").value(1));
     }
 
     @Test

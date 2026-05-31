@@ -6,17 +6,20 @@ import com.example.orderflow.order.dto.OrderResponse;
 import com.example.orderflow.order.event.OrderPlacedEvent;
 import com.example.orderflow.order.exception.InvalidOrderStatusTransitionException;
 import com.example.orderflow.order.exception.OrderNotFoundException;
-import com.example.orderflow.order.kafka.OrderEventPublisher;
 import com.example.orderflow.order.model.Order;
 import com.example.orderflow.order.model.OrderItem;
 import com.example.orderflow.order.model.OrderStatus;
+import com.example.orderflow.order.model.OutboxEvent;
 import com.example.orderflow.order.repository.OrderRepository;
+import com.example.orderflow.order.repository.OutboxRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -28,7 +31,15 @@ import java.util.List;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final OrderEventPublisher eventPublisher;
+
+    private final OutboxRepository outboxRepository;
+
+    // ObjectMapper serializuje zdarzenie do JSON JUZ w momencie zapisu do outbox - relay wysyla
+    // gotowe bajty i nie musi znac typu zdarzenia.
+    private final ObjectMapper objectMapper;
+
+    @Value("${kafka.topics.order-placed:order-service.order.placed}")
+    private String orderPlacedTopic;
 
     @Transactional
     public OrderResponse create(OrderRequest request) {
@@ -60,7 +71,13 @@ public class OrderService {
         Order saved = orderRepository.save(order);
         log.info("Order created: id={}, sessionId={}, total={}", saved.getId(), saved.getSessionId(), saved.getTotal());
 
-        eventPublisher.publishOrderPlaced(toEvent(saved));
+        OrderPlacedEvent event = toEvent(saved);
+        outboxRepository.save(OutboxEvent.builder()
+                .aggregateId(saved.getId())
+                .topic(orderPlacedTopic)
+                .messageKey(saved.getId())
+                .payload(objectMapper.writeValueAsString(event))
+                .build());
 
         return toResponse(saved);
     }

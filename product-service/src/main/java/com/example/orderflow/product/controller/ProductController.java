@@ -24,10 +24,12 @@ public class ProductController {
     }
 
     @GetMapping
-    @Operation(summary = "Get all products", description = "Returns paginated list of all products")
+    @Operation(summary = "Get all products", description = "Returns paginated products, optionally filtered by category and/or search term")
     public Page<ProductResponse> getAll(
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String search,
             @PageableDefault(size = 20, sort = "name") Pageable pageable) {
-        return productService.getAll(pageable);
+        return productService.getAll(category, search, pageable);
     }
 
     @GetMapping("/{id}")

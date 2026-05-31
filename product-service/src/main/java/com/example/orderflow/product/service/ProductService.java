@@ -29,9 +29,21 @@ public class ProductService {
         return ProductResponse.fromProduct(product);
     }
 
-    public Page<ProductResponse> getAll(Pageable pageable) {
-        return productRepository.findAll(pageable)
-                .map(ProductResponse::fromProduct);
+    public Page<ProductResponse> getAll(String category, String search, Pageable pageable) {
+        boolean hasCategory = category != null && !category.isBlank();
+        boolean hasSearch = search != null && !search.isBlank();
+
+        Page<Product> page;
+        if (hasCategory && hasSearch) {
+            page = productRepository.findByCategoryAndNameContainingIgnoreCase(category, search, pageable);
+        } else if (hasCategory) {
+            page = productRepository.findByCategory(category, pageable);
+        } else if (hasSearch) {
+            page = productRepository.findByNameContainingIgnoreCase(search, pageable);
+        } else {
+            page = productRepository.findAll(pageable);
+        }
+        return page.map(ProductResponse::fromProduct);
     }
 
     public Page<ProductResponse> getByCategory(String category, Pageable pageable) {

@@ -41,11 +41,7 @@ public class CartService {
         Product product = productRepository.findById(request.productId())
                 .orElseThrow(() -> new ProductNotFoundException(request.productId()));
 
-        String currentQtyStr = hashOperations.get(cartKey, request.productId());
-        int currentQty = currentQtyStr != null ? Integer.parseInt(currentQtyStr) : 0;
-        int newQty = currentQty + request.quantity();
-
-        hashOperations.put(cartKey, request.productId(), String.valueOf(newQty));
+        hashOperations.increment(cartKey, request.productId(), request.quantity());
 
         redisTemplate.expire(cartKey, CART_TTL);
 
@@ -118,7 +114,7 @@ public class CartService {
             BigDecimal lineTotal = product.getPrice().multiply(BigDecimal.valueOf(quantity));
             total = total.add(lineTotal);
 
-            items.add(new CartItemResponse(productId, product.getName(), product.getPrice(), quantity, lineTotal));
+            items.add(new CartItemResponse(productId, product.getName(), product.getImageUrl(), product.getPrice(), quantity, lineTotal));
         }
 
         return new CartResponse(sessionId, items, items.size(), total);

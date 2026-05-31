@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyIterable;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
@@ -114,26 +115,27 @@ class CartServiceTest {
     // --- addItem ---
 
     @Test
-    @DisplayName("should add new product to cart with correct quantity")
+    @DisplayName("should add new product to cart via atomic HINCRBY")
     void shouldAddNewProductToCart() {
         when(productRepository.findById(PRODUCT_ID)).thenReturn(Optional.of(laptop));
-        doReturn(null).when(hashOperations).get(CART_KEY, PRODUCT_ID);
+        doReturn(2L).when(hashOperations).increment(CART_KEY, PRODUCT_ID, 2L);
 
         cartService.addItem(SESSION_ID, new CartItemRequest(PRODUCT_ID, 2));
 
-        verify(hashOperations).put(CART_KEY, PRODUCT_ID, "2");
+        verify(hashOperations).increment(CART_KEY, PRODUCT_ID, 2L);
         verify(redisTemplate).expire(eq(CART_KEY), any(Duration.class));
     }
 
     @Test
-    @DisplayName("should increment quantity when product already exists in cart")
+    @DisplayName("should increment quantity atomically when product already exists in cart")
     void shouldIncrementQuantityForExistingCartItem() {
         when(productRepository.findById(PRODUCT_ID)).thenReturn(Optional.of(laptop));
-        doReturn("3").when(hashOperations).get(CART_KEY, PRODUCT_ID);
+        // istniejaca ilosc (np. 3) jest po stronie Redisa; HINCRBY o 2 da 5 - tu sprawdzamy delta.
+        doReturn(5L).when(hashOperations).increment(CART_KEY, PRODUCT_ID, 2L);
 
         cartService.addItem(SESSION_ID, new CartItemRequest(PRODUCT_ID, 2));
 
-        verify(hashOperations).put(CART_KEY, PRODUCT_ID, "5"); // 3 + 2 = 5
+        verify(hashOperations).increment(CART_KEY, PRODUCT_ID, 2L);
     }
 
     @Test
@@ -144,7 +146,7 @@ class CartServiceTest {
         assertThatThrownBy(() -> cartService.addItem(SESSION_ID, new CartItemRequest(PRODUCT_ID, 1)))
                 .isInstanceOf(ProductNotFoundException.class);
 
-        verify(hashOperations, never()).put(any(), any(), any());
+        verify(hashOperations, never()).increment(any(), any(), anyLong());
         verify(redisTemplate, never()).expire(any(), any());
     }
 

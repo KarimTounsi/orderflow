@@ -1,6 +1,8 @@
 package com.example.orderflow.order.kafka;
 
+import com.example.orderflow.order.event.FulfillmentCompletedEvent;
 import com.example.orderflow.order.event.FulfillmentFailedEvent;
+import com.example.orderflow.order.exception.InvalidOrderStatusTransitionException;
 import com.example.orderflow.order.exception.OrderNotFoundException;
 import com.example.orderflow.order.model.OrderStatus;
 import com.example.orderflow.order.service.OrderService;
@@ -59,5 +61,30 @@ class FulfillmentEventConsumerTest {
                 .when(orderService).updateStatus("non-existent-order", OrderStatus.CANCELLED);
 
         consumer.handleFulfillmentFailed("{\"orderId\":\"non-existent-order\"}");
+    }
+
+    @Test
+    @DisplayName("should confirm order when fulfillment completes (saga success path)")
+    void shouldConfirmOrderOnFulfillmentCompleted() throws Exception {
+        FulfillmentCompletedEvent event = new FulfillmentCompletedEvent(
+                "order-uuid-123", "session-abc", "customer@orderflow.demo", Instant.now());
+        when(objectMapper.readValue(anyString(), any(Class.class))).thenReturn(event);
+
+        consumer.handleFulfillmentCompleted("{\"orderId\":\"order-uuid-123\"}");
+
+        verify(orderService).updateStatus("order-uuid-123", OrderStatus.CONFIRMED);
+    }
+
+    @Test
+    @DisplayName("should swallow invalid transition on duplicate completed event (idempotency)")
+    void shouldSwallowInvalidTransitionOnDuplicateCompleted() throws Exception {
+        FulfillmentCompletedEvent event = new FulfillmentCompletedEvent(
+                "order-uuid-123", "session-abc", "customer@orderflow.demo", Instant.now());
+        when(objectMapper.readValue(anyString(), any(Class.class))).thenReturn(event);
+        doThrow(new InvalidOrderStatusTransitionException(OrderStatus.CONFIRMED, OrderStatus.CONFIRMED))
+                .when(orderService).updateStatus("order-uuid-123", OrderStatus.CONFIRMED);
+
+        // nie powinno rzucic - duplikat jest bezpiecznie ignorowany
+        consumer.handleFulfillmentCompleted("{\"orderId\":\"order-uuid-123\"}");
     }
 }

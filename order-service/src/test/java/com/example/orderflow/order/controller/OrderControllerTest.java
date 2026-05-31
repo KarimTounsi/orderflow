@@ -177,7 +177,7 @@ class OrderControllerTest {
         mockMvc.perform(get("/api/v1/orders/non-existent"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
-                .andExpect(jsonPath("$.message").value("Order with id 'non-existent' not found"));
+                .andExpect(jsonPath("$.detail").value("Order with id 'non-existent' not found"));
     }
 
     @Test
@@ -189,7 +189,7 @@ class OrderControllerTest {
         mockMvc.perform(get("/api/v1/orders").param("sessionId", "session-abc"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id").value("order-uuid-123"))
-                .andExpect(jsonPath("$.totalElements").value(1));
+                .andExpect(jsonPath("$.page.totalElements").value(1));
     }
 
     @Test

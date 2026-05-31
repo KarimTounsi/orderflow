@@ -5,18 +5,21 @@ import com.example.orderflow.order.dto.OrderRequest;
 import com.example.orderflow.order.dto.OrderResponse;
 import com.example.orderflow.order.exception.InvalidOrderStatusTransitionException;
 import com.example.orderflow.order.exception.OrderNotFoundException;
-import com.example.orderflow.order.kafka.OrderEventPublisher;
 import com.example.orderflow.order.model.Order;
 import com.example.orderflow.order.model.OrderItem;
 import com.example.orderflow.order.model.OrderStatus;
+import com.example.orderflow.order.model.OutboxEvent;
 import com.example.orderflow.order.repository.OrderRepository;
+import com.example.orderflow.order.repository.OutboxRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import tools.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -36,7 +39,10 @@ class OrderServiceTest {
     private OrderRepository orderRepository;
 
     @Mock
-    private OrderEventPublisher eventPublisher;
+    private OutboxRepository outboxRepository;
+
+    @Mock
+    private ObjectMapper objectMapper;
 
     @InjectMocks
     private OrderService orderService;
@@ -73,9 +79,10 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("create - should save order, publish event, and return response")
-    void shouldCreateOrderAndPublishEvent() {
+    @DisplayName("create - should save order, write outbox event, and return response")
+    void shouldCreateOrderAndWriteOutbox() {
         when(orderRepository.save(any(Order.class))).thenReturn(testOrder);
+        when(objectMapper.writeValueAsString(any())).thenReturn("{\"orderId\":\"order-uuid-123\"}");
 
         OrderResponse result = orderService.create(testRequest);
 
@@ -86,7 +93,11 @@ class OrderServiceTest {
         assertThat(result.items()).hasSize(1);
 
         verify(orderRepository, times(1)).save(any(Order.class));
-        verify(eventPublisher, times(1)).publishOrderPlaced(any());
+        ArgumentCaptor<OutboxEvent> captor = ArgumentCaptor.forClass(OutboxEvent.class);
+        verify(outboxRepository, times(1)).save(captor.capture());
+        assertThat(captor.getValue().getAggregateId()).isEqualTo("order-uuid-123");
+        assertThat(captor.getValue().getMessageKey()).isEqualTo("order-uuid-123");
+        assertThat(captor.getValue().getPayload()).contains("order-uuid-123");
     }
 
     @Test

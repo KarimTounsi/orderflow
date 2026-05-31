@@ -25,6 +25,7 @@ public class OrderEventConsumer {
     private final FulfillmentService fulfillmentService;
     private final FulfillmentEventPublisher eventPublisher;
     private final ObjectMapper objectMapper;
+    private final ProcessedOrderStore processedOrderStore;
 
     @RetryableTopic(
             attempts = "3",
@@ -45,7 +46,18 @@ public class OrderEventConsumer {
             return;
         }
         log.info("Received order.placed: orderId={}, sessionId={}", event.orderId(), event.sessionId());
-        fulfillmentService.process(event);
+
+        if (!processedOrderStore.claim(event.orderId())) {
+            log.info("Duplicate order.placed for orderId={} - already processed, skipping", event.orderId());
+            return;
+        }
+
+        try {
+            fulfillmentService.process(event);
+        } catch (RuntimeException e) {
+            processedOrderStore.release(event.orderId());
+            throw e;
+        }
     }
 
     @DltHandler

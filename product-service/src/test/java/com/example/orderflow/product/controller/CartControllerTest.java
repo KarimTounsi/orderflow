@@ -43,7 +43,7 @@ class CartControllerTest {
         emptyCart = new CartResponse(SESSION_ID, List.of(), 0, BigDecimal.ZERO);
 
         CartItemResponse item = new CartItemResponse(
-                "product-1", "Test Laptop", new BigDecimal("1999.99"), 2, new BigDecimal("3999.98")
+                "product-1", "Test Laptop", "/products/test-laptop.jpg", new BigDecimal("1999.99"), 2, new BigDecimal("3999.98")
         );
         cartWithItem = new CartResponse(SESSION_ID, List.of(item), 1, new BigDecimal("3999.98"));
     }
@@ -175,7 +175,7 @@ class CartControllerTest {
                         .header("X-Session-Id", SESSION_ID)
                         .param("quantity", "-1"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Quantity cannot be negative, got: -1"));
+                .andExpect(jsonPath("$.detail").value("Quantity cannot be negative, got: -1"));
     }
 
     @Test
