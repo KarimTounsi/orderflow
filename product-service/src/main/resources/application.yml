@@ -7,12 +7,15 @@ spring:
       enabled: true
 
   mongodb:
-    uri: mongodb://localhost:27017/orderflow_products
+    # env z fallbackiem: lokalnie localhost, na AWS SPRING_MONGODB_URI = connection string z Atlas
+    uri: ${SPRING_MONGODB_URI:mongodb://localhost:27017/orderflow_products}
 
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+      # Upstash wymaga hasla; lokalnie puste (brak auth)
+      password: ${SPRING_DATA_REDIS_PASSWORD:}
 
     web:
       pageable:
@@ -41,3 +44,13 @@ management:
   endpoint:
     health:
       show-details: always
+
+---
+spring:
+  config:
+    activate:
+      on-profile: cloud
+  data:
+    redis:
+      ssl:
+        enabled: true

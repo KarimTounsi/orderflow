@@ -4,11 +4,12 @@ spring:
 
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+      password: ${SPRING_DATA_REDIS_PASSWORD:}
 
   kafka:
-    bootstrap-servers: localhost:9094
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9094}
     consumer:
       group-id: fulfillment-service.order-processing.consumer
       auto-offset-reset: earliest
@@ -23,10 +24,10 @@ spring:
         max.in.flight.requests.per.connection: 5
 
   mail:
-    host: localhost
-    port: 1025
-    username: ""
-    password: ""
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
     properties:
       mail:
         smtp:
@@ -54,3 +55,18 @@ management:
   endpoint:
     health:
       show-details: always
+
+---
+spring:
+  config:
+    activate:
+      on-profile: cloud
+  data:
+    redis:
+      ssl:
+        enabled: true
+  kafka:
+    properties:
+      security.protocol: SASL_SSL
+      sasl.mechanism: PLAIN
+      sasl.jaas.config: ${KAFKA_SASL_JAAS_CONFIG}

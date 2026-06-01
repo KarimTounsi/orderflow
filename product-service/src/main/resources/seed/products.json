@@ -1,0 +1,226 @@
+[
+  {
+    "name": "Sony WH-1000XM5",
+    "description": "Industry-leading noise canceling headphones with 30-hour battery life.",
+    "price": 1299.99,
+    "category": "Electronics",
+    "imageUrl": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=600&fit=crop&q=80",
+    "stock": 15
+  },
+  {
+    "name": "Apple AirPods Pro 2",
+    "description": "Active noise cancellation with spatial audio.",
+    "price": 999.99,
+    "category": "Electronics",
+    "imageUrl": "/products/airpods-pro-2.jpg",
+    "stock": 8
+  },
+  {
+    "name": "Nike Air Max 270",
+    "description": "Iconic Air unit in the heel for all-day comfort.",
+    "price": 499.99,
+    "category": "Clothing",
+    "imageUrl": "/products/nike-air-max-270.jpg",
+    "stock": 20
+  },
+  {
+    "name": "Adidas Ultraboost 23",
+    "description": "Responsive Boost midsole returns energy with every step.",
+    "price": 649.99,
+    "category": "Clothing",
+    "imageUrl": "/products/adidas-ultraboost.jpg",
+    "stock": 12
+  },
+  {
+    "name": "MacBook Air M3",
+    "description": "Supercharged by M3 chip. Up to 18 hours battery life.",
+    "price": 5999.99,
+    "category": "Electronics",
+    "imageUrl": "/products/macbook-air-m3.jpg",
+    "stock": 5
+  },
+  {
+    "name": "Clean Code - Robert Martin",
+    "description": "Essential reading for every professional developer.",
+    "price": 89.99,
+    "category": "Books",
+    "imageUrl": "/products/clean-code.jpg",
+    "stock": 30
+  },
+  {
+    "name": "Yoga Mat Premium",
+    "description": "Non-slip surface, extra thick 6mm cushioning.",
+    "price": 149.99,
+    "category": "Sports",
+    "imageUrl": "https://images.unsplash.com/photo-1592432678016-e910b452f9a2?w=600&h=600&fit=crop&q=80",
+    "stock": 25
+  },
+  {
+    "name": "Kindle Paperwhite",
+    "description": "Glare-free display, adjustable warm light, waterproof.",
+    "price": 699.99,
+    "category": "Electronics",
+    "imageUrl": "/products/kindle-paperwhite.jpg",
+    "stock": 18
+  },
+  {
+    "name": "Dyson V15 Detect",
+    "description": "Laser detects invisible dust. Up to 60min runtime.",
+    "price": 2899.99,
+    "category": "Home",
+    "imageUrl": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=600&fit=crop&q=80",
+    "stock": 7
+  },
+  {
+    "name": "Stanley Quencher 1.2L",
+    "description": "Keeps drinks cold for 2 days, hot for 5 hours.",
+    "price": 199.99,
+    "category": "Sports",
+    "imageUrl": "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=600&h=600&fit=crop&q=80",
+    "stock": 40
+  },
+  {
+    "name": "The Pragmatic Programmer",
+    "description": "Your journey to mastery. 20th Anniversary Edition.",
+    "price": 109.99,
+    "category": "Books",
+    "imageUrl": "/products/pragmatic-programmer.jpg",
+    "stock": 22
+  },
+  {
+    "name": "Samsung 4K Monitor 27",
+    "description": "27-inch 4K UHD IPS panel, 144Hz, HDR600, USB-C.",
+    "price": 2199.99,
+    "category": "Electronics",
+    "imageUrl": "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=600&h=600&fit=crop&q=80",
+    "stock": 9
+  },
+  {
+    "name": "Lego Technic BMW M 1000 RR",
+    "description": "1920 piece authentic replica with detailed engine.",
+    "price": 599.99,
+    "category": "Home",
+    "imageUrl": "/products/lego-technic.jpg",
+    "stock": 14
+  },
+  {
+    "name": "iPad Pro 13 M4",
+    "description": "Ultra Retina XDR OLED display. Thinnest Apple product ever. M4 chip.",
+    "price": 7499.99,
+    "category": "Electronics",
+    "imageUrl": "/products/ipad-pro-m4.jpg",
+    "stock": 6
+  },
+  {
+    "name": "Levi 501 Original Jeans",
+    "description": "The original blue jean since 1873. Straight fit.",
+    "price": 349.99,
+    "category": "Clothing",
+    "imageUrl": "https://images.unsplash.com/photo-1542272604-787c3835535d?w=600&h=600&fit=crop&q=80",
+    "stock": 35
+  },
+  {
+    "name": "New Balance 990v6",
+    "description": "Made in USA. Premium materials, ENCAP midsole.",
+    "price": 899.99,
+    "category": "Clothing",
+    "imageUrl": "/products/new-balance-990.jpg",
+    "stock": 10
+  },
+  {
+    "name": "System Design Interview",
+    "description": "An Insider Guide by Alex Xu.",
+    "price": 129.99,
+    "category": "Books",
+    "imageUrl": "/products/system-design-interview.jpg",
+    "stock": 18
+  },
+  {
+    "name": "Kettlebell 16kg",
+    "description": "Cast iron, flat base, powder coated.",
+    "price": 199.99,
+    "category": "Sports",
+    "imageUrl": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=600&fit=crop&q=80",
+    "stock": 20
+  },
+  {
+    "name": "Philips Hue Starter Kit",
+    "description": "3 smart bulbs + bridge. 16 million colors.",
+    "price": 499.99,
+    "category": "Home",
+    "imageUrl": "/products/philips-hue.jpg",
+    "stock": 11
+  },
+  {
+    "name": "GoPro Hero 12 Black",
+    "description": "5.3K video, HyperSmooth 6.0, waterproof to 10m.",
+    "price": 1799.99,
+    "category": "Electronics",
+    "imageUrl": "/products/gopro-hero.jpg",
+    "stock": 9
+  },
+  {
+    "name": "Zara Oversized Blazer",
+    "description": "Structured shoulder, double button closure.",
+    "price": 279.99,
+    "category": "Clothing",
+    "imageUrl": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=600&h=600&fit=crop&q=80",
+    "stock": 16
+  },
+  {
+    "name": "Running Foam Roller",
+    "description": "High density EVA foam. Deep tissue massage.",
+    "price": 79.99,
+    "category": "Sports",
+    "imageUrl": "https://images.unsplash.com/photo-1571731956672-f2b94d7dd0cb?w=600&h=600&fit=crop&q=80",
+    "stock": 30
+  },
+  {
+    "name": "Atomic Habits - James Clear",
+    "description": "Tiny changes, remarkable results.",
+    "price": 59.99,
+    "category": "Books",
+    "imageUrl": "/products/atomic-habits.jpg",
+    "stock": 45
+  },
+  {
+    "name": "Nespresso Vertuo Next",
+    "description": "Coffee and espresso machine. 5 cup sizes.",
+    "price": 799.99,
+    "category": "Home",
+    "imageUrl": "/products/nespresso-vertuo.jpg",
+    "stock": 13
+  },
+  {
+    "name": "Logitech MX Master 3S",
+    "description": "Silent clicks, 8K DPI sensor, USB-C.",
+    "price": 479.99,
+    "category": "Electronics",
+    "imageUrl": "/products/logitech-mx-master.jpg",
+    "stock": 22
+  },
+  {
+    "name": "Pull-up Bar Doorframe",
+    "description": "No screws needed. Supports up to 150kg.",
+    "price": 129.99,
+    "category": "Sports",
+    "imageUrl": "https://images.unsplash.com/photo-1598971639058-fab3c3109a00?w=600&h=600&fit=crop&q=80",
+    "stock": 27
+  },
+  {
+    "name": "The Design of Everyday Things",
+    "description": "Don Norman classic. Essential for product designers.",
+    "price": 79.99,
+    "category": "Books",
+    "imageUrl": "/products/design-everyday-things.jpg",
+    "stock": 20
+  },
+  {
+    "name": "IKEA KALLAX Shelf",
+    "description": "4x4 cube shelving unit. Versatile storage.",
+    "price": 399.99,
+    "category": "Home",
+    "imageUrl": "/products/ikea-kallax.jpg",
+    "stock": 8
+  }
+]

@@ -1,0 +1,53 @@
+# docker-compose.prod.yml - uruchamia 3 serwisy OrderFlow na EC2 z profilem 'cloud'.
+# Serwisy lacza sie do MANAGED uslug (Confluent/Atlas/Neon/Upstash) przez zmienne z pliku .env.
+# Email idzie do Mailhog (kontener obok) - dla dema wystarcza; produkcyjnie podmienic na SES.
+#
+# Uzycie na EC2:
+#   1) skopiuj .env.example -> .env i uzupelnij credentiale
+#   2) zbuduj jary:  mvn clean package -DskipTests
+#   3) docker compose -f docker-compose.prod.yml up -d --build
+#
+# JAVA_TOOL_OPTIONS -Xmx256m: 3 serwisy JVM na malym EC2 (t3.small 2GB) - ograniczamy sterte,
+# zeby sie zmiescic. Jak masz wiekszy instance, mozesz to podniesc/usunac.
+
+services:
+  product-service:
+    build: ./product-service
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      SPRING_PROFILES_ACTIVE: cloud
+      JAVA_TOOL_OPTIONS: "-Xmx256m"
+    ports:
+      - "8081:8081"
+
+  order-service:
+    build: ./order-service
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      SPRING_PROFILES_ACTIVE: cloud
+      JAVA_TOOL_OPTIONS: "-Xmx256m"
+    ports:
+      - "8082:8082"
+
+  fulfillment-service:
+    build: ./fulfillment-service
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      SPRING_PROFILES_ACTIVE: cloud
+      JAVA_TOOL_OPTIONS: "-Xmx256m"
+      MAIL_HOST: mailhog
+      MAIL_PORT: "1025"
+    depends_on:
+      - mailhog
+    ports:
+      - "8083:8083"
+
+  # Mailhog - lapie maile potwierdzajace zamowienie; UI na :8025 (do pokazania na demo).
+  mailhog:
+    image: mailhog/mailhog:latest
+    restart: unless-stopped
+    ports:
+      - "8025:8025"

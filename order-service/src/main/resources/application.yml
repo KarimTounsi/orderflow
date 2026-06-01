@@ -3,9 +3,9 @@ spring:
     name: order-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/orderflow_orders
-    username: orderflow
-    password: secret
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/orderflow_orders}
+    username: ${SPRING_DATASOURCE_USERNAME:orderflow}
+    password: ${SPRING_DATASOURCE_PASSWORD:secret}
     driver-class-name: org.postgresql.Driver
 
   flyway:
@@ -27,7 +27,7 @@ spring:
         serialization-mode: via-dto
 
   kafka:
-    bootstrap-servers: localhost:9094
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9094}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -56,3 +56,16 @@ management:
   endpoint:
     health:
       show-details: always
+
+---
+spring:
+  config:
+    activate:
+      on-profile: cloud
+  kafka:
+    properties:
+      security.protocol: SASL_SSL
+      sasl.mechanism: PLAIN
+      # KAFKA_SASL_JAAS_CONFIG = org.apache.kafka.common.security.plain.PlainLoginModule required
+      #   username="<API_KEY>" password="<API_SECRET>"; (z panelu Confluent Cloud, przez env/secret)
+      sasl.jaas.config: ${KAFKA_SASL_JAAS_CONFIG}
