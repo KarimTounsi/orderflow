@@ -1,10 +1,12 @@
 # OrderFlow
 
-E-commerce backend demo showcasing event-driven microservices architecture with four core technologies: **Kafka**, **Redis**, **MongoDB**, and **PostgreSQL**. Runs end-to-end locally via Docker Compose and is designed for cloud deployment (AWS EC2 + managed services).
+E-commerce backend demo showcasing event-driven microservices architecture with four core technologies: **Kafka**, **Redis**, **MongoDB**, and **PostgreSQL**. Runs end-to-end locally via Docker Compose and is deployed live to the cloud (AWS EC2 + managed services) with a Next.js storefront on Vercel.
 
 [![Coverage](https://img.shields.io/badge/coverage-80%25-brightgreen)]()
 [![Java](https://img.shields.io/badge/Java-25-orange)]()
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.6-green)]()
+
+**Live demo:** [orderflow-frontend-five.vercel.app](https://orderflow-frontend-five.vercel.app) - browse the catalog, semantic search, and an AI shopping assistant (RAG).
 
 ## Architecture
 
@@ -71,7 +73,7 @@ sequenceDiagram
 | Cache | Redis | Product catalog cache (TTL 5min), shopping cart session (TTL 24h) |
 | Document DB | MongoDB | Flexible product schema with variants and attributes |
 | Vector search | pgvector + Spring AI | Semantic search and RAG over the catalog; embeddings computed locally with an ONNX model (no external API) |
-| Relational DB | PostgreSQL / Neon | ACID transactions for orders |
+| Relational DB | PostgreSQL / Supabase | ACID transactions for orders |
 | Schema | Flyway | Versioned, repeatable database migrations |
 | API docs | springdoc-openapi 3 | Interactive Swagger UI per service |
 | Infrastructure | AWS EC2 + Docker Compose | Containerized deployment |
@@ -156,20 +158,23 @@ open http://localhost:8090
 | Email keeps failing | Retried via retry topics, then DLT, then the order is auto-cancelled (saga) |
 | Kafka UI at :8090 | Real-time view of events flowing between services |
 
-## Target deployment topology
+## Deployment topology
 
-The verified runnable setup today is local Docker Compose (see above). The intended cloud
-mapping for each piece - the production topology this project is designed for - is:
+Runs locally via Docker Compose (see above) and is **deployed live** to the cloud. The mapping
+for each piece:
 
-| Concern | Local (verified) | Target cloud |
-|---------|------------------|--------------|
+| Concern | Local | Cloud (deployed) |
+|---------|-------|------------------|
 | Services | Docker Compose | AWS EC2 (Docker Compose) |
 | Kafka | apache/kafka container | Confluent Cloud |
 | MongoDB | mongo container | MongoDB Atlas |
-| PostgreSQL | postgres container | Neon (serverless) |
+| PostgreSQL | postgres container | Supabase - separate projects for orders and pgvector vectors |
 | Redis | redis container | Upstash |
-| Email | Mailhog | AWS SES |
+| Email | Mailhog | Mailhog on the instance (SES-ready) |
 | Frontend | Next.js dev server | Vercel |
+
+The RAG retrieval (semantic search) runs in production; the LLM answer step (`/ask`) is behind a
+feature flag and enabled per environment.
 
 ## CI
 
