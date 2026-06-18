@@ -33,6 +33,9 @@ class ProductServiceTest {
     @Mock
     private ProductRepository productRepository;
 
+    @Mock
+    private com.example.orderflow.product.rag.ProductIndexService productIndexService;
+
     @InjectMocks
     private ProductService productService;
 

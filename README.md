@@ -58,7 +58,7 @@ sequenceDiagram
 
 | Service | Port | Technologies | Responsibility |
 |---------|------|-------------|----------------|
-| product-service | 8081 | MongoDB, Redis | Product catalog, shopping cart |
+| product-service | 8081 | MongoDB, Redis, pgvector | Product catalog, shopping cart, semantic search + AI shopping assistant (RAG) |
 | order-service | 8082 | PostgreSQL, Kafka | Order placement, event publishing, saga compensation |
 | fulfillment-service | 8083 | Kafka, SMTP/SES | Order processing, email confirmation |
 
@@ -70,6 +70,7 @@ sequenceDiagram
 | Messaging | Apache Kafka | Async event-driven communication between services |
 | Cache | Redis | Product catalog cache (TTL 5min), shopping cart session (TTL 24h) |
 | Document DB | MongoDB | Flexible product schema with variants and attributes |
+| Vector search | pgvector + Spring AI | Semantic search and RAG over the catalog; embeddings computed locally with an ONNX model (no external API) |
 | Relational DB | PostgreSQL / Neon | ACID transactions for orders |
 | Schema | Flyway | Versioned, repeatable database migrations |
 | API docs | springdoc-openapi 3 | Interactive Swagger UI per service |
@@ -101,6 +102,16 @@ event-driven system:
   messages land in a dead-letter topic handled by `@DltHandler`.
 - **Saga compensation.** When fulfillment fails for good, `fulfillment.failed` triggers a
   compensating transaction in `order-service` that moves the order to `CANCELLED`.
+- **RAG as a degradable feature, not a hard dependency.** product-service offers semantic search
+  and an AI shopping assistant over the catalog. Product text is embedded locally with an ONNX
+  model (all-MiniLM-L6-v2, 384 dims, no external API) and stored in pgvector; `/search/ask`
+  retrieves the most similar products and lets an LLM answer strictly from that context, refusing
+  to invent products when nothing matches (anti-hallucination). The LLM sits behind a feature flag:
+  with no API key the service still starts, semantic search keeps working, and only `/ask` returns
+  503. Indexing is a best-effort dual-write (catalog write + vector upsert under a deterministic
+  id), because a search index is rebuildable (`POST /search/reindex`) - a lost vector is a worse
+  result, not a lost order. Contrast with the order path above, where correctness is non-negotiable
+  and uses the Outbox.
 - **RFC 9457 Problem Details.** All errors are returned as `application/problem+json`
   (Spring `ProblemDetail`) - a standard, tooling-friendly error contract.
 - **Schema as code.** Hibernate runs in `validate` mode; Flyway owns the schema via versioned
@@ -137,6 +148,8 @@ open http://localhost:8090
 | Action | What happens under the hood |
 |--------|----------------------------|
 | Browse products | MongoDB query, then Redis cache (second request is much faster) |
+| Semantic search | Natural-language query is embedded locally (ONNX) and matched against pgvector by cosine similarity |
+| Ask the assistant | Retrieves similar products from pgvector, an LLM answers from that context and returns its sources (full RAG) |
 | Add to cart | Cart stored in Redis hash with 24h TTL |
 | Place order | Saved to PostgreSQL with an `outbox` row in one transaction; `OutboxRelay` then publishes `order.placed` to Kafka |
 | Receive confirmation email | fulfillment-service consumes the event (skipping duplicates via Redis) and sends email |
