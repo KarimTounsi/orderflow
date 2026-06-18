@@ -16,9 +16,9 @@ spring:
     uri: ${SPRING_MONGODB_URI:mongodb://localhost:27017/orderflow_products}
 
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/orderflow_vectors}
-    username: ${SPRING_DATASOURCE_USERNAME:orderflow}
-    password: ${SPRING_DATASOURCE_PASSWORD:secret}
+    url: ${VECTOR_DATASOURCE_URL:jdbc:postgresql://localhost:5432/orderflow_vectors}
+    username: ${VECTOR_DATASOURCE_USERNAME:orderflow}
+    password: ${VECTOR_DATASOURCE_PASSWORD:secret}
 
   ai:
     model:
