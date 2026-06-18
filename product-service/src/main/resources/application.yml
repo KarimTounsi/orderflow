@@ -2,6 +2,11 @@ spring:
   application:
     name: product-service
 
+  config:
+    import:
+      - optional:file:.env[.properties]
+      - optional:file:../.env[.properties]
+
   threads:
     virtual:
       enabled: true
@@ -9,6 +14,36 @@ spring:
   mongodb:
     # env z fallbackiem: lokalnie localhost, na AWS SPRING_MONGODB_URI = connection string z Atlas
     uri: ${SPRING_MONGODB_URI:mongodb://localhost:27017/orderflow_products}
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/orderflow_vectors}
+    username: ${SPRING_DATASOURCE_USERNAME:orderflow}
+    password: ${SPRING_DATASOURCE_PASSWORD:secret}
+
+  ai:
+    model:
+      chat: ${RAG_CHAT_MODEL:none}
+      embedding: transformers
+      image: none
+      moderation: none
+      audio:
+        speech: none
+        transcription: none
+    openai:
+      base-url: ${OPENROUTER_BASE_URL:https://openrouter.ai/api}
+      api-key: ${OPENROUTER_API_KEY:}
+      chat:
+        options:
+          model: ${OPENROUTER_MODEL:openai/gpt-5-mini}
+          # Niska temperatura = mniej "kreatywnosci" - asystent zakupowy ma trzymac sie faktow
+          temperature: 0.2
+    vectorstore:
+      pgvector:
+        initialize-schema: true
+        table-name: product_vectors
+        dimensions: 384
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
 
   data:
     redis:

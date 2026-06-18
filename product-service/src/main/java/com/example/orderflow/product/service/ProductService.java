@@ -4,7 +4,9 @@ import com.example.orderflow.product.dto.ProductRequest;
 import com.example.orderflow.product.dto.ProductResponse;
 import com.example.orderflow.product.exception.ProductNotFoundException;
 import com.example.orderflow.product.model.Product;
+import com.example.orderflow.product.rag.ProductIndexService;
 import com.example.orderflow.product.repository.ProductRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -14,12 +16,32 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final ProductIndexService productIndexService;
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository, ProductIndexService productIndexService) {
         this.productRepository = productRepository;
+        this.productIndexService = productIndexService;
+    }
+
+    private void safeIndex(Product product) {
+        try {
+            productIndexService.index(product);
+        } catch (Exception e) {
+            log.warn("Vector indexing failed for product {} (search index can be rebuilt via reindex): {}",
+                    product.getId(), e.getMessage());
+        }
+    }
+
+    private void safeRemoveFromIndex(String productId) {
+        try {
+            productIndexService.removeFromIndex(productId);
+        } catch (Exception e) {
+            log.warn("Vector index removal failed for product {}: {}", productId, e.getMessage());
+        }
     }
 
     @Cacheable(value = "products", key = "#id")
@@ -68,6 +90,7 @@ public class ProductService {
                 .build();
 
         Product saved = productRepository.save(product);
+        safeIndex(saved);
         return ProductResponse.fromProduct(saved);
     }
 
@@ -85,6 +108,7 @@ public class ProductService {
         product.setAttributes(request.attributes());
 
         Product updated = productRepository.save(product);
+        safeIndex(updated);
         return ProductResponse.fromProduct(updated);
     }
 
@@ -96,6 +120,8 @@ public class ProductService {
             throw new ProductNotFoundException(id);
         }
         productRepository.deleteById(id);
+        // Usuniety produkt nie moze wracac w wynikach wyszukiwania - czyscimy indeks wektorowy.
+        safeRemoveFromIndex(id);
     }
 
     @CachePut(value = "products", key = "#id")

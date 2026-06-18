@@ -1,38 +1,21 @@
 package com.example.orderflow.product.repository;
 
+import com.example.orderflow.product.AbstractIntegrationTest;
 import com.example.orderflow.product.model.Product;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.MongoDBContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
-@Testcontainers
 @DisplayName("ProductRepository Integration Tests with Testcontainers")
-class ProductRepositoryIntegrationTest {
-
-    @Container
-    @ServiceConnection
-    static final MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:7.0");
-
-    @Container
-    @ServiceConnection
-    @SuppressWarnings("resource")
-    static final GenericContainer<?> redisContainer =
-            new GenericContainer<>("redis:7-alpine").withExposedPorts(6379);
+class ProductRepositoryIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
     private ProductRepository productRepository;
