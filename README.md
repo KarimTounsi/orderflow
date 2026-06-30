@@ -8,6 +8,8 @@ E-commerce backend demo showcasing event-driven microservices architecture with 
 
 **Live demo:** [orderflow-frontend-five.vercel.app](https://orderflow-frontend-five.vercel.app) - browse the catalog, semantic search, and an AI shopping assistant (RAG).
 
+**Frontend repository:** [KarimTounsi/orderflow-frontend](https://github.com/KarimTounsi/orderflow-frontend)
+
 ## Architecture
 
 ```
@@ -123,7 +125,7 @@ event-driven system:
 
 ## Running Locally
 
-**Prerequisites:** Docker, Java 25, Maven
+**Prerequisites:** Docker, Java 25 (Maven is provided by the included Maven Wrapper - use `./mvnw`)
 
 ```bash
 # Start infrastructure (Kafka, Redis, MongoDB, PostgreSQL, Kafka UI)
