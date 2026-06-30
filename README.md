@@ -10,6 +10,8 @@ E-commerce backend demo showcasing event-driven microservices architecture with 
 
 **Frontend repository:** [KarimTounsi/orderflow-frontend](https://github.com/KarimTounsi/orderflow-frontend)
 
+> **Note on the live demo:** it runs the read paths and order placement - catalog, cart, semantic search, the RAG assistant, and orders persisted via the transactional outbox. The Kafka fulfillment saga (fulfillment + order-status transitions) is fully reproducible locally via Docker Compose; it is not kept running on the live instance to avoid cloud costs after the managed-Kafka trial ended. Thanks to the outbox, order placement stays correct regardless - events are persisted and would publish once a broker is connected.
+
 ## Architecture
 
 ```
@@ -177,7 +179,7 @@ for each piece:
 | Concern | Local | Cloud (deployed) |
 |---------|-------|------------------|
 | Services | Docker Compose | AWS EC2 (Docker Compose) |
-| Kafka | apache/kafka container | Confluent Cloud |
+| Kafka | apache/kafka container | Confluent Cloud (trial); saga paused on live to avoid cost (see note above) |
 | MongoDB | mongo container | MongoDB Atlas |
 | PostgreSQL | postgres container | Supabase - separate projects for orders and pgvector vectors |
 | Redis | redis container | Upstash |
