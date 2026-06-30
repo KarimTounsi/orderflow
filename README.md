@@ -160,6 +160,15 @@ open http://localhost:8090
 | Email keeps failing | Retried via retry topics, then DLT, then the order is auto-cancelled (saga) |
 | Kafka UI at :8090 | Real-time view of events flowing between services |
 
+## Screenshots
+
+The live system - the catalog served from MongoDB/Redis, and the RAG shopping assistant grounding its
+answer in pgvector-retrieved products with cited similarity scores:
+
+| Catalog | AI shopping assistant (RAG) |
+|---|---|
+| ![Product catalog](docs/screenshots/home.png) | ![AI shopping assistant with semantic search and cited sources](docs/screenshots/ai-assistant.png) |
+
 ## Deployment topology
 
 Runs locally via Docker Compose (see above) and is **deployed live** to the cloud. The mapping
