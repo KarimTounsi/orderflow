@@ -1,16 +1,14 @@
 # OrderFlow
 
-E-commerce backend demo showcasing event-driven microservices architecture with four core technologies: **Kafka**, **Redis**, **MongoDB**, and **PostgreSQL**. Runs end-to-end locally via Docker Compose and is deployed live to the cloud (AWS EC2 + managed services) with a Next.js storefront on Vercel.
+E-commerce backend demo showcasing event-driven microservices architecture with four core technologies: **Kafka**, **Redis**, **MongoDB**, and **PostgreSQL**. Runs end-to-end locally via Docker Compose; it was previously deployed to the cloud (AWS EC2 + managed services) with a Next.js storefront on Vercel.
 
 [![Coverage](https://img.shields.io/badge/coverage-80%25-brightgreen)]()
 [![Java](https://img.shields.io/badge/Java-25-orange)]()
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.6-green)]()
 
-**Live demo:** [orderflow-frontend-five.vercel.app](https://orderflow-frontend-five.vercel.app) - browse the catalog, semantic search, and an AI shopping assistant (RAG).
+> **Note:** the cloud deployment (AWS EC2 + managed services) has been taken down to avoid ongoing cloud costs. The whole system runs end-to-end locally via Docker Compose - see the screenshots for the previously deployed version.
 
 **Frontend repository:** [KarimTounsi/orderflow-frontend](https://github.com/KarimTounsi/orderflow-frontend)
-
-> **Note on the live demo:** it runs the read paths and order placement - catalog, cart, semantic search, the RAG assistant, and orders persisted via the transactional outbox. The Kafka fulfillment saga (fulfillment + order-status transitions) is fully reproducible locally via Docker Compose; it is not kept running on the live instance to avoid cloud costs after the managed-Kafka trial ended. Thanks to the outbox, order placement stays correct regardless - events are persisted and would publish once a broker is connected.
 
 ## Architecture
 
@@ -164,7 +162,7 @@ open http://localhost:8090
 
 ## Screenshots
 
-The live system - the catalog served from MongoDB/Redis, and the RAG shopping assistant grounding its
+The previously deployed system - the catalog served from MongoDB/Redis, and the RAG shopping assistant grounding its
 answer in pgvector-retrieved products with cited similarity scores:
 
 | Catalog | AI shopping assistant (RAG) |
@@ -173,20 +171,20 @@ answer in pgvector-retrieved products with cited similarity scores:
 
 ## Deployment topology
 
-Runs locally via Docker Compose (see above) and is **deployed live** to the cloud. The mapping
-for each piece:
+Runs locally via Docker Compose (see above). It was previously deployed to the cloud (now taken
+down to avoid costs); `docker-compose.prod.yml` still documents that setup. The mapping for each piece:
 
-| Concern | Local | Cloud (deployed) |
+| Concern | Local | Cloud (previous deployment) |
 |---------|-------|------------------|
 | Services | Docker Compose | AWS EC2 (Docker Compose) |
-| Kafka | apache/kafka container | Confluent Cloud (trial); saga paused on live to avoid cost (see note above) |
+| Kafka | apache/kafka container | Confluent Cloud (trial) |
 | MongoDB | mongo container | MongoDB Atlas |
 | PostgreSQL | postgres container | Supabase - separate projects for orders and pgvector vectors |
 | Redis | redis container | Upstash |
 | Email | Mailhog | Mailhog on the instance (SES-ready) |
 | Frontend | Next.js dev server | Vercel |
 
-The RAG retrieval (semantic search) runs in production; the LLM answer step (`/ask`) is behind a
+In the cloud deployment the RAG retrieval (semantic search) ran in production; the LLM answer step (`/ask`) is behind a
 feature flag and enabled per environment.
 
 ## CI
